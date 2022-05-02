@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: frontend-app
+  namespace: {{ .Values.namespace }}
+  labels:
+    app: frontend
+spec:
+  replicas: {{ .Values.replicas }}
+  selector:
+    matchLabels:
+      app: frontend
+  template:
+    metadata:
+      labels:
+        app: frontend
+    spec:
+      containers:
+      - name: frontend
+        image: {{ .Values.image }}
+        ports:
+        - containerPort: {{ .Values.port }}
+      {{- if.Values.configMap }}
+        volumeMounts:
+          - name: {{ .Values.configMap.name }}
+            mountPath: {{ .Values.configMap.mountPath }}
+      volumes:
+      - name: {{ .Values.configMap.volumes.name }}
+        configMap:
+          name: {{ .Values.configMap.volumes.configName }}
+      {{- end }}
